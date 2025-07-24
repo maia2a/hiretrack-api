@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Job {
-  id  String
+  id  String  @id @default(cuid())
   title String
   description String
   location  String
@@ -23,9 +23,19 @@ model Job {
 
   application Application[]
 }
+model Candidate{
+   id       String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  resumeUrl String? 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  applications Application[]
+}
 model Application {
-  id  String  @id@default(cuid())
+  id  String  @id @default(cuid())
   stage Stage @default(APPLIED)
   appliedAt DateTime  @default(now())
   jobId String  
@@ -35,7 +45,7 @@ model Application {
   candidate Candidate @relation(fields: [candidateId], references: [id])
   feedbacks Feedback[]
 
-  @unique([jobId, candidateId])
+  @@unique([jobId, candidateId])
 }
 
 model Feedback {
