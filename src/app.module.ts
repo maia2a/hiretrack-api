@@ -5,9 +5,10 @@ import { JobsModule } from './jobs/jobs.module';
 import { PrismaService } from './prisma/prisma.service';
 
 import { clerkMiddleware } from '@clerk/express';
+import { CandidatesModule } from './candidates/candidates.module';
 
 @Module({
-  imports: [JobsModule],
+  imports: [JobsModule, CandidatesModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
