@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCandidateDto } from './dto/create-candidate.dto';
 import { UpdateCandidateDto } from './dto/update-candidate.dto';
 
 @Injectable()
 export class CandidatesService {
+  constructor(private readonly prisma: PrismaService) {}
   create(createCandidateDto: CreateCandidateDto) {
-    return 'This action adds a new candidate';
+    return this.prisma.candidate.create({
+      data: createCandidateDto,
+    });
   }
 
   findAll() {
-    return `This action returns all candidates`;
+    return this.prisma.candidate.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} candidate`;
+  async findOne(id: string) {
+    const candidate = await this.prisma.candidate.findUnique({
+      where: { id },
+    });
+    if (!candidate) {
+      throw new NotFoundException('Candidato não encontrado');
+    }
+    return candidate;
   }
 
-  update(id: number, updateCandidateDto: UpdateCandidateDto) {
-    return `This action updates a #${id} candidate`;
+  update(id: string, updateCandidateDto: UpdateCandidateDto) {
+    return this.prisma.candidate.update({
+      where: { id },
+      data: updateCandidateDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} candidate`;
+  remove(id: string) {
+    return this.prisma.candidate.delete({
+      where: { id },
+    });
   }
 }
