@@ -7,9 +7,10 @@ import { PrismaService } from './prisma/prisma.service';
 import { clerkMiddleware } from '@clerk/express';
 import { ApplicationsModule } from './applications/applications.module';
 import { CandidatesModule } from './candidates/candidates.module';
+import { FeedbackModule } from './feedback/feedback.module';
 
 @Module({
-  imports: [JobsModule, CandidatesModule, ApplicationsModule],
+  imports: [JobsModule, CandidatesModule, ApplicationsModule, FeedbackModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })
