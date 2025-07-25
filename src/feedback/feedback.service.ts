@@ -1,26 +1,36 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Injectable()
 export class FeedbackService {
-  create(createFeedbackDto: CreateFeedbackDto) {
-    return 'This action adds a new feedback';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(createFeedbackDto: CreateFeedbackDto, authorId: string) {
+    const application = await this.prisma.application.findUnique({
+      where: { id: createFeedbackDto.applicationId },
+    });
+
+    if (!application) {
+      throw new NotFoundException(
+        `Aplicação com ID "${createFeedbackDto.applicationId}" não encontrada.`,
+      );
+    }
+
+    return this.prisma.feedback.create({
+      data: {
+        ...createFeedbackDto,
+        author: authorId,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all feedback`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} feedback`;
-  }
-
-  update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
-    return `This action updates a #${id} feedback`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} feedback`;
+  findByApplication(applicationId: string) {
+    return this.prisma.feedback.findMany({
+      where: { applicationId },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 }

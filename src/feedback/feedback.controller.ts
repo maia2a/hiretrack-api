@@ -1,34 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FeedbackService } from './feedback.service';
+import { ExpressRequestWithAuth } from '@clerk/express';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { FeedbackService } from './feedback.service';
 
 @Controller('feedback')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
   @Post()
-  create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbackService.create(createFeedbackDto);
+  create(
+    @Body() createFeedbackDto: CreateFeedbackDto,
+    @Req() req: ExpressRequestWithAuth,
+  ) {
+    const { userId } = req.auth();
+    if (!userId) {
+      throw new UnauthorizedException('Você não está autenticado');
+    }
+
+    return this.feedbackService.create(createFeedbackDto, userId);
   }
 
   @Get()
-  findAll() {
-    return this.feedbackService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.feedbackService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFeedbackDto: UpdateFeedbackDto) {
-    return this.feedbackService.update(+id, updateFeedbackDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.feedbackService.remove(+id);
+  findByApplication(@Param('applicationId') applicationId: string) {
+    return this.feedbackService.findByApplication(applicationId);
   }
 }
