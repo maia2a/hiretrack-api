@@ -34,4 +34,13 @@ export class JobsService {
       where: { id },
     });
   }
+
+  async findApplicationsByJob(jobId: string) {
+    return this.prisma.application.findMany({
+      where: { jobId },
+      include: {
+        candidate: true,
+      },
+    });
+  }
 }
