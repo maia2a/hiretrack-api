@@ -8,9 +8,16 @@ import { clerkMiddleware } from '@clerk/express';
 import { ApplicationsModule } from './applications/applications.module';
 import { CandidatesModule } from './candidates/candidates.module';
 import { FeedbackModule } from './feedback/feedback.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
-  imports: [JobsModule, CandidatesModule, ApplicationsModule, FeedbackModule],
+  imports: [
+    JobsModule,
+    CandidatesModule,
+    ApplicationsModule,
+    FeedbackModule,
+    S3Module,
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

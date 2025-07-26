@@ -2,11 +2,17 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CandidatesService } from './candidates.service';
 import { CreateCandidateDto } from './dto/create-candidate.dto';
 import { UpdateCandidateDto } from './dto/update-candidate.dto';
@@ -20,9 +26,20 @@ export class CandidatesController {
     return this.candidatesService.create(createCandidateDto);
   }
 
-  @Get()
-  findAll() {
-    return this.candidatesService.findAll();
+  @Post('upload-resume')
+  @UseInterceptors(FileInterceptor('resume'))
+  createFromResume(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: 'application/pdf' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    return this.candidatesService.handleResumeUpload(file);
   }
 
   @Get(':id')
